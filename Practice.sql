@@ -7,28 +7,29 @@ FROM Artist
 ORDER BY ArtistName;
 
 --Write a SELECT query that lists all the songs in the Song table and include the Artist name
-SELECT s.Title,
-		a.ArtistName
+SELECT 
+	s.*,
+	a.ArtistName
 FROM Song s
-	LEFT JOIN Artist a on s.ArtistId = a.Id;
+	LEFT JOIN Artist a ON s.ArtistId = a.Id;
 
-SELECT s.Title,
+SELECT s.*,
 		a.ArtistName
 FROM Song s
-	INNER JOIN Artist a on s.ArtistId = a.Id;
+	INNER JOIN Artist a ON s.ArtistId = a.Id;
 
 --Write a SELECT query that lists all the Artists that have a Soul Album
 SELECT DISTINCT ArtistName
 From Artist a
-	LEFT JOIN Album al on al.ArtistId = a.Id
-	LEFT JOIN Genre g on g.Id = al.GenreId
+	JOIN Album al ON al.ArtistId = a.Id
+	JOIN Genre g ON g.Id = al.GenreId
 	WHERE g.Name = 'Soul';
 
 --Write a SELECT query that lists all the Artists that have a Jazz or Rock Album
-SELECT DISTINCT ArtistName
+SELECT DISTINCT a.*
 From Artist a
-	LEFT JOIN Album al on al.ArtistId = a.Id
-	LEFT JOIN Genre g on g.Id = al.GenreId
+	JOIN Album al ON al.ArtistId = a.Id
+	JOIN Genre g ON g.Id = al.GenreId
 	WHERE g.Name = 'Jazz' OR g.Name = 'Rock';
 
 --Write a SELECT statement that lists the Albums with no songs
@@ -57,6 +58,9 @@ WHERE s.Id IS NULL;
 --INSERT INTO Song (Title, SongLength, ReleaseDate, GenreId, ArtistId, AlbumId)
 --VALUES ('Get Real Get Right', 310, 2010, 14, 28, 23);
 
+--INSERT INTO Song (Title, SongLength, ReleaseDate, GenreId, ArtistId, AlbumId)
+--VALUES ('Impossible Soul', 1535, 2010, 14, 28, 23);
+
 
 --Write a SELECT query that provides the song titles, album title, and artist name for all of the data you just entered in. Use the LEFT JOIN keyword sequence to connect the tables, and the WHERE keyword to filter the results to the album and artist you added.
 SELECT s.Title, al.Title, ar.ArtistName
@@ -77,30 +81,12 @@ WHERE ar.ArtistName = 'Sufjan Stevens'
 --SELECT a.Title, s.Title FROM Song s LEFT JOIN Album a ON s.AlbumId = a.Id;
 
 --Write a SELECT statement to display how many songs exist for each album. You'll need to use the COUNT() function and the GROUP BY keyword sequence.
-SELECT al.Title, COUNT(s.Id)
-FROM Song s
-	LEFT JOIN Album al ON al.Id = s.AlbumId
-GROUP BY al.Title;
-
-SELECT AlbumId, COUNT(Id)
-FROM Song
-GROUP BY AlbumId;
-
-SELECT al.Title, Count(s.AlbumId)
+SELECT al.Title, Count(s.AlbumId) AS NumberOfSongs
 FROM Album al
 	LEFT JOIN Song s ON s.AlbumId = Al.Id
 GROUP BY al.Title;
 
 --Write a SELECT statement to display how many songs exist for each artist. You'll need to use the COUNT() function and the GROUP BY keyword sequence.
-SELECT ArtistId, COUNT(Id)
-FROM Song
-GROUP BY ArtistId;
-
-SELECT ar.ArtistName, COUNT(s.Id)
-FROM Song s
-	LEFT JOIN Artist ar ON ar.Id = s.ArtistId
-GROUP BY ar.ArtistName;
-
 SELECT ar.ArtistName, COUNT(s.Id)
 FROM Artist ar
 	LEFT JOIN Song s ON ar.Id = s.ArtistId
@@ -110,25 +96,25 @@ GROUP BY ar.ArtistName;
 SELECT g.Name, COUNT(s.Id)
 FROM Genre g
 	LEFT JOIN Song s ON s.GenreId = g.Id
-GROUP BY g.Name;
+GROUP BY g.Name, g.Id;
 
 --Write a SELECT query that lists the Artists that have put out records on more than one record label. Hint: When using GROUP BY instead of using a WHERE clause, use the HAVING keyword
-SELECT ar.ArtistName, al.Label
+SELECT ar.ArtistName
 FROM Album al
-	LEFT JOIN Artist ar ON al.ArtistId = ar.Id
-GROUP BY ar.ArtistName, al.Label
-HAVING COUNT(al.Label) >= 2;
+	JOIN Artist ar ON al.ArtistId = ar.Id
+GROUP BY ar.ArtistName, ar.Id
+HAVING COUNT(DISTINCT al.Label) >= 2;
 
-SELECT ar.ArtistName, al.Label
+SELECT ar.ArtistName
 FROM Artist ar
-	LEFT JOIN Album al ON al.ArtistId = ar.Id
-GROUP BY ar.ArtistName, al.Label
-HAVING COUNT(al.Label) >= 2;
+	JOIN Album al ON al.ArtistId = ar.Id
+GROUP BY ar.ArtistName, ar.Id
+HAVING COUNT(DISTINCT al.Label) >= 2;
 
-SELECT ArtistId, Label
+SELECT ArtistId
 FROM Album
-GROUP BY ArtistId, Label
-HAVING COUNT(Label) >= 2;
+GROUP BY ArtistId
+HAVING COUNT(DISTINCT Label) >= 2;
 
 --Using ORDER BY and TOP 1, write a select statement to find the album with the longest duration. The result should display the album title and the duration.
 SELECT TOP 1 Title, AlbumLength
